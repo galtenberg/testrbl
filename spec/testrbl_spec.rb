@@ -81,6 +81,33 @@ describe Testrbl do
         result.should_not include "BCD"
       end
     end
+
+    context "test with test/test_helper" do
+      before do
+        write "test/test_helper.rb", <<-RUBY
+          puts 'CDE'
+        RUBY
+      end
+
+      it "creates test folder and file" do
+        File.exist?("test/test_helper.rb").should be_true
+      end
+
+      it "doesn't include test_helper by default" do
+        result = testrbl "a_test.rb"
+        result.should_not include "CDE"
+      end
+
+      it "runs with -I passthrough versions" do
+        result = testrbl "-Itest/ a_test.rb"
+        result.should include "CDE"
+        result = testrbl "a_test.rb -I test/"
+        result.should include "CDE"
+        result = testrbl "a_test.rb -Itest/"
+        result.should include "CDE"
+      end
+    end
+
   end
 
   context "test with string" do
